@@ -48,6 +48,8 @@ $router->post('/post/login', 'Api\ExprefrigController@login');
 
 $router->put('/put/{table}/{id}', 'Api\ExprefrigController@putItem');
 
+$router->put('/activated', 'Api\ExprefrigController@activated');
+
 $router->put('/update/{table}/{id}', 'Api\ExprefrigController@updateItem');
 
 $router->delete('/delete/{id}', 'Api\ExprefrigController@deleteRefrigerator');

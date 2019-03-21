@@ -19,27 +19,41 @@
         }
 
         public function getMember(Request $request){
-            if (strcmp($request->auth,'$2y$12$ZOwD7oZr.jUt7f7YnVxdy.v4P8KDajFq17ueQT1Arw9QjHsS96x3q') == 0)
-                return Member::where('uid',$request->uid)->select('picture','username','name')->get();
+            if ($request->auth == "0fa2e78f70d377d5da274ebd4e8b5e1c")
+                return Member::where('uid',$request->uid)->select('email','name')->get();
             else
-                return '404 Not Found';
+                return abort(404);
         }
 
         public function getByDevice($pv_key)
         {
-            $item = app('db')->select("SELECT TIMESTAMPDIFF(SECOND,CONVERT_TZ(NOW(), @@session.time_zone, '+07:00'),dateTime) as sec FROM devices WHERE private_key = '$pv_key'");
-            $hour = $item[0]->sec / 3600;
-            $min = ($item[0]->sec - (floor($hour)*3600))/60;
-            $sec = ($item[0]->sec - (floor($hour)*3600)) - (floor($min) * 60);
+            $item = app('db')->select("SELECT TIMESTAMPDIFF(SECOND,CONVERT_TZ(NOW(), @@session.time_zone, '+07:00'),dateTime) as secRed,TIMESTAMPDIFF(SECOND,CONVERT_TZ(NOW(), @@session.time_zone, '+07:00'),dateTimeYellow) as secYellow,name,image,dateTime FROM devices WHERE private_key = '$pv_key'");
+            $hour = $item[0]->secRed / 3600;
+            $min = ($item[0]->secRed - (floor($hour)*3600))/60;
+            $sec = ($item[0]->secRed - (floor($hour)*3600)) - (floor($min) * 60);
+            $hourY = $item[0]->secYellow / 3600;
+            $minY = ($item[0]->secYellow - (floor($hourY)*3600))/60;
+            $secY = ($item[0]->secYellow - (floor($hourY)*3600)) - (floor($minY) * 60);
             if ($hour < 0){
                 $hour = -1;
                 $min = 0;
                 $sec =0;
             }
+            if ($hourY < 0){
+                $hourY = -1;
+                $minY = 0;
+                $secY =0;
+            }
             $time = [
                 "hour"=>floor($hour),
                 "min"=>floor($min),
                 "sec"=>$sec,
+                "hour2" =>floor($hourY),
+                "min2"=>floor($minY),
+                "sec2"=>$secY,
+                "name"=>$item[0]->name,
+                "image"=>$item[0]->image,
+                "dateTime"=>$item[0]->dateTime
             ];
             return response()->json($time);
         }
@@ -51,12 +65,12 @@
 
         public function getMyDevice($uid)
         {
-            return Device::select('private_key')->where('uid',$uid)->get();
+            return Device::select('private_key')->where('uid',$uid)->where('refrig_id',null)->get();
         }
 
         public function getDevice($uid,$rid)
         {
-            return app('db')->select('SELECT private_key,name,DATE_FORMAT(dateTime, "%d %M %Y") as dateExp,DATE_FORMAT(dateTime, "%T") as timeExp,DATE_FORMAT(dateTimeYellow, "%T") as timeYellowExp,image FROM devices WHERE uid='.$uid.' AND refrig_id = '.$rid);
+            return app('db')->select('SELECT @id := @id + 1 id,dateTime,dateTimeYellow,private_key,name,image FROM devices,(SELECT @id := -1) m WHERE uid='.$uid.' AND refrig_id = '.$rid);
         }
 
         public function register(Request $request)
@@ -108,8 +122,14 @@
 
             try
             {
-                $item = app('db')->update("UPDATE devices SET name = '$request->name',refrig_id = '$request->id',dateTime = CONVERT_TZ('$request->datetime',@@session.time_zone, '+07:00'),dateTimeYellow = CONVERT_TZ('$request->datetimeYellow',@@session.time_zone, '+07:00') WHERE private_key = '$request->private_key'");
-                return 1;
+                return Device::where('private_key',$request->private_key)
+                    ->update([
+                        "name" => $request->name,
+                        "refrig_id" => $request->id,
+                        "dateTime" => date('Y-m-d:H-i-s', strtotime($request->datetime)),
+                        "dateTimeYellow" => date('Y-m-d:H-i-s', strtotime($request->datetimeYellow))
+                    ]);
+                //$item = app('db')->update("UPDATE devices SET name = '$request->name',refrig_id = '$request->id',dateTime = CONVERT_TZ('$request->datetime',@@session.time_zone, '+07:00'),dateTimeYellow = CONVERT_TZ('$request->datetimeYellow',@@session.time_zone, '+07:00') WHERE private_key = '$request->private_key'");
             }catch (Exception $e){
                 return $e;
             }
@@ -147,7 +167,7 @@
             try
             {
                 return Member::select('uid','name')
-                    ->where('username',$request->username)
+                    ->where('email',$request->username)
                     ->where('password',$request->password)
                     ->get();
             }catch (Exception $e){
@@ -167,10 +187,15 @@
             }
         }
 
+        public  function  activated(Request $request){
+            Device::where('private_key',$request->pv_key)->update(['uid'=> $request->uid]);
+            return BoardFactory::where('private_key',$request->pv_key)->update(['activated' => $request->status,'own' => $request->uid]);
+        }
+
         public function putItem(Request $request,$id,$table)
         {
-            $update = app('db')->update("UPDATE $table SET actived = '$request->status',own = '$request->uid' WHERE private_key = '$id'");
-            $insert = app('db')->insert("INSERT INTO device(private_key,uid) VALUES ('$id','$request->uid')");
+            $update = app('db')->update("UPDATE $table SET activated = '$request->status',own = '$request->uid' WHERE private_key = '$id'");
+            BoardFactory::update(['activated' => 'yes','own' => $request->uid])->where('private_key',$id);
             return $update;
         }
 

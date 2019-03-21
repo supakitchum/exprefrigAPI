@@ -15,7 +15,7 @@ class BoardFactoriesTableSeeder extends Seeder
             0 =>
                 [
                     'private_key' => 'tw72B2kcAq',
-                    'status' => 'no',
+                    'activated' => 'no',
                     'chip_id' => null,
                     'created_at' => \Carbon\Carbon::now()->format('Y-m-d H:i:s'),
                     'updated_at' => \Carbon\Carbon::now()->format('Y-m-d H:i:s')

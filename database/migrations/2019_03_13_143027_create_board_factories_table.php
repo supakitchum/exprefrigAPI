@@ -16,7 +16,8 @@ class CreateBoardFactoriesTable extends Migration
         Schema::create('board_factories', function (Blueprint $table) {
             $table->string('private_key',10);
             $table->primary('private_key');
-            $table->enum('status',['yes','no'])->default('no');
+            $table->enum('activated',['yes','no'])->default('no');
+            $table->integer('own')->nullable();
             $table->text('chip_id')->nullable();
             $table->timestamps();
         });
