@@ -15,8 +15,10 @@ class MembersTableSeeder extends Seeder
                 0 =>
                     [
                         'email' => 'admin',
-                        'password' => '1234',
+                        'password' => app('hash')->make('1234'),
                         'name' => 'admin',
+                        'created_at' => \Carbon\Carbon::now()->format('Y-m-d H:i:s'),
+                        'updated_at' => \Carbon\Carbon::now()->format('Y-m-d H:i:s')
                     ]
             ]
         );
