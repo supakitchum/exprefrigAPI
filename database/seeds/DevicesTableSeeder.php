@@ -12,7 +12,7 @@ class DevicesTableSeeder extends Seeder
     public function run()
     {
         DB::table('devices')->insert([
-            0 =>
+         0 =>
                 [
                     'private_key' => 'tw72B2kcAq',
                     'refrig_id' => null,
@@ -44,7 +44,6 @@ class DevicesTableSeeder extends Seeder
                     'created_at' => \Carbon\Carbon::now()->format('Y-m-d H:i:s'),
                     'updated_at' => \Carbon\Carbon::now()->format('Y-m-d H:i:s')
                 ]
-
         ]);
     }
 }
