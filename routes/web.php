@@ -22,6 +22,8 @@ $router->get('/key', function(){
 //RESTful API
 $router->get('/get', 'Api\ExprefrigController@getItem');
 
+$router->get('/get/all/myDevice/{uid}', 'Api\ExprefrigController@getAllMyDevice');
+
 $router->post('/get/user', 'Api\ExprefrigController@getMember');
 
 $router->get('/get/app/{uid}','Api\ExprefrigController@getByApplication');

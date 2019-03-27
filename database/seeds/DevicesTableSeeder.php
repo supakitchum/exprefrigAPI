@@ -15,7 +15,7 @@ class DevicesTableSeeder extends Seeder
                 0 =>
                     [
                         'private_key' => 'tw72B2kcAq',
-                        'refrig_id' => 'admin',
+                        'refrig_id' => null,
                         'name' => null,
                         'created_at' => \Carbon\Carbon::now()->format('Y-m-d H:i:s'),
                         'updated_at' => \Carbon\Carbon::now()->format('Y-m-d H:i:s')
