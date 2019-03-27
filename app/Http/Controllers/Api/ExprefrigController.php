@@ -13,6 +13,11 @@ use Laravel\Lumen\Routing\Controller as BaseController;
 
 class ExprefrigController extends BaseController
 {
+    public function getNow()
+    {
+        date_default_timezone_set('Asia/Bangkok');
+        return \Carbon\Carbon::now()->format('Y-m-d H:i:s');
+    }
 
     public function getItem()
     {
@@ -76,6 +81,7 @@ class ExprefrigController extends BaseController
 
     public function getDevice($uid, $rid)
     {
+        date_default_timezone_set('Asia/Bangkok');
         $qr = app('db')->select('SELECT @id := @id + 1 id,dateTime,dateTimeYellow,private_key,name,image FROM devices,(SELECT @id := -1) m WHERE uid=' . $uid . ' AND refrig_id = ' . $rid);
         $now = \Carbon\Carbon::now()->format('Y-m-d H:i:s');
         foreach ($qr as $result){

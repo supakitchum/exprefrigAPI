@@ -20,6 +20,7 @@ $router->get('/key', function(){
 });
 
 //RESTful API
+$router->get('/','Api\ExprefrigController@getNow');
 $router->get('/get', 'Api\ExprefrigController@getItem');
 
 $router->get('/get/all/myDevice/{uid}', 'Api\ExprefrigController@getAllMyDevice');
