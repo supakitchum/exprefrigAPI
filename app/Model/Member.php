@@ -13,6 +13,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Member extends Model
 {
+    protected $primaryKey = 'uid';
     protected $fillable = ['password', 'name'];
 }
 ?>
