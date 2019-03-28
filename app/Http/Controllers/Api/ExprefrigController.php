@@ -84,8 +84,8 @@ class ExprefrigController extends BaseController
     public function getDevice($uid, $rid)
     {
         date_default_timezone_set('Asia/Bangkok');
-        $qr = Device::where("uid",$uid)->where("refrig_id",$rid)->select("dateTime","dateTimeYellow","private_key","name","image")->get();
-        $qr = app('db')->select('SELECT dateTime,dateTimeYellow,private_key,name,image FROM devices WHERE uid=' . $uid . ' AND refrig_id = ' . $rid);
+        $qr = Device::select('dateTime','dateTimeYellow','private_key','name','image')->where('uid',$uid)->where('refrig_id',$rid)->get();
+        //$qr = app('db')->select('SELECT dateTime,dateTimeYellow,private_key,name,image FROM devices WHERE uid=' . $uid . ' AND refrig_id = ' . $rid);
         $now = \Carbon\Carbon::now()->format('Y-m-d H:i:s');
         $count = 0;
         foreach ($qr as $result){
