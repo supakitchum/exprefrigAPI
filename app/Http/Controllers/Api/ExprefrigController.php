@@ -147,8 +147,8 @@ class ExprefrigController extends BaseController
                 ->update([
                     "name" => $request->name,
                     "refrig_id" => $request->id,
-                    "dateTime" => date('Y-m-d:H-i-s', strtotime($request->datetime)),
-                    "dateTimeYellow" => date('Y-m-d:H-i-s', strtotime($request->datetimeYellow))
+                    "dateTime" => date('Y-m-d H-i-s', strtotime($request->datetime)),
+                    "dateTimeYellow" => date('Y-m-d H-i-s', strtotime($request->datetimeYellow))
                 ]);
             //$item = app('db')->update("UPDATE devices SET name = '$request->name',refrig_id = '$request->id',dateTime = CONVERT_TZ('$request->datetime',@@session.time_zone, '+07:00'),dateTimeYellow = CONVERT_TZ('$request->datetimeYellow',@@session.time_zone, '+07:00') WHERE private_key = '$request->private_key'");
         } catch (Exception $e) {
