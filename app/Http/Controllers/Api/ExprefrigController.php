@@ -84,8 +84,9 @@ class ExprefrigController extends BaseController
     public function getDevice($uid, $rid)
     {
         date_default_timezone_set('Asia/Bangkok');
-        $qr = app('db')->select('SELECT @id := @id + 1 id,dateTime,dateTimeYellow,private_key,name,image FROM devices,(SELECT @id := -1) m WHERE uid=' . $uid . ' AND refrig_id = ' . $rid);
+        $qr = app('db')->select('SELECT dateTime,dateTimeYellow,private_key,name,image FROM devices WHERE uid=' . $uid . ' AND refrig_id = ' . $rid);
         $now = \Carbon\Carbon::now()->format('Y-m-d H:i:s');
+        $count = 0;
         foreach ($qr as $result){
             $status = "green";
             if (strtotime($now) > strtotime($result->dateTime))
@@ -93,6 +94,8 @@ class ExprefrigController extends BaseController
             elseif (strtotime($now) > strtotime($result->dateTimeYellow))
                 $status = "yellow";
             $result->status = $status;
+            $result->id = $count;
+            $count++;
 
         }
         return $qr;
