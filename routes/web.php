@@ -55,8 +55,4 @@ $router->put('/activated', 'Api\ExprefrigController@activated');
 
 $router->put('/update/{table}/{id}', 'Api\ExprefrigController@updateItem');
 
-$router->put('/update/{uid}', 'Api\ExprefrigController@updateProfile');
-
 $router->delete('/delete/{id}', 'Api\ExprefrigController@deleteRefrigerator');
-
-$router->delete('/delete/device/{id}', 'Api\ExprefrigController@deleteDevice');

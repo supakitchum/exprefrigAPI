@@ -38,7 +38,7 @@ class ExprefrigController extends BaseController
 
     public function getByDevice($pv_key)
     {
-        $item = app('db')->select("SELECT CONVERT_TZ(created_at, @@session.time_zone, '+07:00') as created_at,CONVERT_TZ(updated_at, @@session.time_zone, '+07:00') as updated_at,TIMESTAMPDIFF(SECOND,CONVERT_TZ(NOW(), @@session.time_zone, '+07:00'),dateTime) as secRed,TIMESTAMPDIFF(SECOND,CONVERT_TZ(NOW(), @@session.time_zone, '+07:00'),dateTimeYellow) as secYellow,name,image,dateTime FROM devices WHERE private_key = '$pv_key'");
+        $item = app('db')->select("SELECT TIMESTAMPDIFF(SECOND,CONVERT_TZ(NOW(), @@session.time_zone, '+07:00'),dateTime) as secRed,TIMESTAMPDIFF(SECOND,CONVERT_TZ(NOW(), @@session.time_zone, '+07:00'),dateTimeYellow) as secYellow,name,image,dateTime FROM devices WHERE private_key = '$pv_key'");
         $hour = $item[0]->secRed / 3600;
         $min = ($item[0]->secRed - (floor($hour) * 3600)) / 60;
         $sec = ($item[0]->secRed - (floor($hour) * 3600)) - (floor($min) * 60);
@@ -64,9 +64,7 @@ class ExprefrigController extends BaseController
             "sec2" => $secY,
             "name" => $item[0]->name,
             "image" => $item[0]->image,
-            "dateTime" => $item[0]->dateTime,
-            "created_at" => $item[0]->created_at,
-            "updated_at" => $item[0]->updated_at
+            "dateTime" => $item[0]->dateTime
         ];
         return response()->json($time);
     }
@@ -212,7 +210,6 @@ class ExprefrigController extends BaseController
         }
     }
 
-
     public function activated(Request $request)
     {
         Device::where('private_key', $request->pv_key)->update(['uid' => $request->uid]);
@@ -231,37 +228,10 @@ class ExprefrigController extends BaseController
         return app('db')->table($table)->where("refrig_id", $id)->update(["updated_at" => \Carbon\Carbon::now()->toDateTimeString(), "name_refrig" => $request->name_refrig]);
     }
 
-    public function updateProfile(Request $request,$uid){
-        $this->validate($request, [
-            'auth' => 'required'
-        ]);
-        if ($request->auth == "0fa2e78f70d377d5da274ebd4e8b5e1c") {
-            if (isset($request->password)){
-                $newPass = app('hash')->make($request->password);
-                return Member::where("uid",$uid)->update(["name"=>$request->name,"password"=>$newPass,"updated_at" => \Carbon\Carbon::now()->toDateTimeString()]);
-            }
-            else{
-                return Member::where("uid",$uid)->update(["name"=>$request->name,"updated_at" => \Carbon\Carbon::now()->toDateTimeString()]);
-            }
-        } else
-            return abort(405);
-    }
-
     public function deleteRefrigerator($id)
     {
         try {
             Refrigerator::where('refrig_id', $id)->delete();
-            return "success";
-        } catch (\Exception $e) {
-            return "false";
-        }
-    }
-
-    public function deleteDevice($id)
-    {
-        try {
-            Device::where('private_key', $id)->update(["uid" => null,"refrig_id" => null]);
-            BoardFactory::where('private_key', $id)->update(["activated"=>"no","own"=>null]);
             return "success";
         } catch (\Exception $e) {
             return "false";
