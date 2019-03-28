@@ -12,6 +12,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Refrigerator extends Model
 {
-    protected $fillable = ['refrig_id', 'name_refrig', 'uid'];
+    protected $primaryKey = 'refrig_id';
+    protected $fillable = ['name_refrig', 'uid'];
 }
 ?>
